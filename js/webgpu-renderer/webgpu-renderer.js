@@ -450,6 +450,7 @@ export class WebGPURenderer extends Renderer {
         format,
         srgb: image.colorSpace == "sRGB",
         normal: image.normalMap,
+        preferLowQuality: this.sparkLowQuality
       });
       image.gpuTextureView = texture.createView();
     } else {

@@ -70,6 +70,7 @@
         lightCount: 128,
         maxLightRange: 2,
         enableSpark: false,
+        sparkLowQuality: false,
       };
 
       const meshPaths = {
@@ -111,6 +112,14 @@
         }
         initGltf();
       });
+      gui.add(appSettings, 'sparkLowQuality').onChange(() => {
+        if (renderer) {
+          renderer.sparkLowQuality = appSettings.sparkLowQuality;
+        }
+        initGltf();
+      });
+
+
       /*gui.add(appSettings, 'lightPattern', {
         wandering: 'wandering',
         grid: 'grid',
