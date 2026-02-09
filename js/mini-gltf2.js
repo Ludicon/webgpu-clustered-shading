@@ -257,7 +257,8 @@ export class Gltf2Loader {
 
         glMaterial.baseColorFactor = vec4.clone(pbr.baseColorFactor || DEFAULT_BASE_COLOR_FACTOR);
         glMaterial.baseColorTexture = getTexture(pbr.baseColorTexture,
-          material.alphaMode != 'OPAQUE' ? TextureChannel.RGBA : TextureChannel.RGB, true);
+          (material.alphaMode == 'BLEND' || material.alphaMode == 'MASK') ?
+            TextureChannel.RGBA : TextureChannel.RGB, true);
         glMaterial.metallicRoughnessFactor = vec2.clone([
           pbr.metallicFactor || 1.0,
           pbr.roughnessFactor || 1.0,
