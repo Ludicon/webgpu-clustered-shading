@@ -28,6 +28,7 @@ import { DepthVisualization, DepthSliceVisualization, ClusterDistanceVisualizati
 import { LightSpriteVertexSource, LightSpriteFragmentSource } from './shaders/light-sprite.js';
 import { vec2, vec3, vec4 } from '../third-party/gl-matrix/dist/esm/index.js';
 import { WebGPUTextureLoader } from '../third-party/web-texture-tool/build/webgpu-texture-loader.js';
+import { Spark } from '../third-party/spark/spark.esm.js';
 
 import { ClusterBoundsSource, ClusterLightsSource, DISPATCH_SIZE, TOTAL_TILES, CLUSTER_LIGHTS_SIZE } from './shaders/clustered-compute.js';
 
@@ -79,7 +80,9 @@ export class WebGPURenderer extends Renderer {
       requiredFeatures.push('texture-compression-astc');
     }
 
-    this.device = await this.adapter.requestDevice({requiredFeatures});
+    const sparkFeatures = Spark.getRequiredFeatures(this.adapter);
+    const combinedFeatures = [ ...new Set([...requiredFeatures, ...sparkFeatures]) ];
+    this.device = await this.adapter.requestDevice({ requiredFeatures: combinedFeatures });
 
     this.contextFormat = 'bgra8unorm';
     if (navigator.gpu.getPreferredCanvasFormat) {
