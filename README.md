@@ -1,3 +1,5 @@
+This is a fork of [Brandon Jones](https://github.com/toji) [WebGPU Clustered Forward Shading demo](https://github.com/toji/webgpu-clustered-shading) that uses [spark.js](https://github.com/ludicon/spark.js) to load compact AVIF textures and transcode them to GPU-compatible formats.
+
 # WebGPU Clustered Forward Shading
 
 Live page at [https://toji.github.io/webgpu-clustered-shading/](https://toji.github.io/webgpu-clustered-shading/).
