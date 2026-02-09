@@ -220,13 +220,16 @@ export class Gltf2Loader {
       }
     }
 
-    function getTexture(textureInfo, sRGB = false) {
+    function getTexture(textureInfo, sRGB = false, normal = false) {
       if (!textureInfo) {
         return null;
       }
       let texture = gltf.textures[textureInfo.index];
       if (sRGB && texture && texture.image) {
         texture.image.colorSpace = 'sRGB';
+      }
+      if (normal && texture && texture.image) {
+        texture.image.normalMap = true;
       }
       return gltf.textures[textureInfo.index];
     }
@@ -245,7 +248,7 @@ export class Gltf2Loader {
           pbr.roughnessFactor || 1.0,
         ]);
         glMaterial.metallicRoughnessTexture = getTexture(pbr.metallicRoughnessTexture);
-        glMaterial.normalTexture = getTexture(material.normalTexture);
+        glMaterial.normalTexture = getTexture(material.normalTexture, false, true);
         glMaterial.occlusionTexture = getTexture(material.occlusionTexture);
         glMaterial.occlusionStrength = (material.occlusionTexture && material.occlusionTexture.strength) ?
                                         material.occlusionTexture.strength : 1.0;
