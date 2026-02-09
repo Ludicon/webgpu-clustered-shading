@@ -121,8 +121,11 @@ function PBRSurfaceInfo(defines) { return wgsl`
 
 #if ${defines.USE_NORMAL_MAP}
     let tbn = mat3x3<f32>(input.tangent, input.bitangent, input.normal);
-    let N = textureSample(normalTexture, defaultSampler, input.texCoord).rgb;
-    surface.normal = normalize(tbn * (2.0 * N - vec3<f32>(1.0, 1.0, 1.0)));
+    var N = 2.0 * textureSample(normalTexture, defaultSampler, input.texCoord).rgb - vec3<f32>(1.0, 1.0, 1.0);
+    if (N.z < -0.5) {
+      N.z = sqrt(saturate(1.0 - dot(N.xy, N.xy)));
+    }
+    surface.normal = normalize(tbn * N);
 #else
     surface.normal = normalize(input.normal);
 #endif
