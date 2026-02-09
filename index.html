@@ -195,10 +195,15 @@
       }
 
       async function initGltf() {
+        console.time('glTF Loading (Total)');
         const gltfLoader = new Gltf2Loader();
         gltf = await gltfLoader.loadFromUrl(appSettings.mesh);
+        console.timeEnd('glTF Loading (Total)');
+
         if (renderer) {
-          renderer.setGltf(gltf);
+          console.time('GPU Resource Upload');
+          await renderer.setGltf(gltf);
+          console.timeEnd('GPU Resource Upload');
         }
       }
       initGltf();
