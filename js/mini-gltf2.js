@@ -209,6 +209,10 @@ export class Gltf2Loader {
         }
         if (texture.extensions && texture.extensions.KHR_texture_basisu) {
           gltf.textures.push(new Texture(gltf.images[texture.extensions.KHR_texture_basisu.source], sampler));
+        } else if (texture.extensions && texture.extensions.EXT_texture_avif) {
+          gltf.textures.push(new Texture(gltf.images[texture.extensions.EXT_texture_avif.source], sampler));
+        } else if (texture.extensions && texture.extensions.EXT_texture_webp) {
+          gltf.textures.push(new Texture(gltf.images[texture.extensions.EXT_texture_webp.source], sampler));
         } else {
           gltf.textures.push(new Texture(gltf.images[texture.source], sampler));
         }
