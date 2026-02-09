@@ -34,6 +34,16 @@ const DEFAULT_SCALE = vec3.fromValues(1, 1, 1);
 const DEFAULT_BASE_COLOR_FACTOR = vec4.fromValues(1, 1, 1, 1);
 const DEFAULT_EMISSIVE_FACTOR = vec3.fromValues(0, 0, 0);
 
+export const TextureChannel = {
+  R: 1, // 0001
+  G: 2, // 0010
+  B: 4, // 0100
+  A: 8, // 1000
+  RG: 3, // 0011
+  RGB: 7, // 0111
+  RGBA: 15 // 1111
+}
+
 const absUriRegEx = new RegExp(`^${window.location.protocol}`, 'i');
 const dataUriRegEx = /^data:/;
 function resolveUri(uri, baseUrl) {
@@ -220,18 +230,22 @@ export class Gltf2Loader {
       }
     }
 
-    function getTexture(textureInfo, sRGB = false, normal = false) {
+    function getTexture(textureInfo, channelMask, sRGB = false, normal = false) {
       if (!textureInfo) {
         return null;
       }
       let texture = gltf.textures[textureInfo.index];
-      if (sRGB && texture && texture.image) {
-        texture.image.colorSpace = 'sRGB';
+      if (texture && texture.image) {
+        texture.image.channelMask |= channelMask;
+        if (sRGB && texture && texture.image) {
+          texture.image.colorSpace = 'sRGB';
+        }
+        if (normal && texture && texture.image) {
+          texture.image.normalMap = true;
+        }
       }
-      if (normal && texture && texture.image) {
-        texture.image.normalMap = true;
-      }
-      return gltf.textures[textureInfo.index];
+
+      return texture;
     }
 
     // Materials
@@ -242,18 +256,19 @@ export class Gltf2Loader {
         let pbr = material.pbrMetallicRoughness || {};
 
         glMaterial.baseColorFactor = vec4.clone(pbr.baseColorFactor || DEFAULT_BASE_COLOR_FACTOR);
-        glMaterial.baseColorTexture = getTexture(pbr.baseColorTexture, true);
+        glMaterial.baseColorTexture = getTexture(pbr.baseColorTexture,
+          material.alphaMode != 'OPAQUE' ? TextureChannel.RGBA : TextureChannel.RGB, true);
         glMaterial.metallicRoughnessFactor = vec2.clone([
           pbr.metallicFactor || 1.0,
           pbr.roughnessFactor || 1.0,
         ]);
-        glMaterial.metallicRoughnessTexture = getTexture(pbr.metallicRoughnessTexture);
-        glMaterial.normalTexture = getTexture(material.normalTexture, false, true);
-        glMaterial.occlusionTexture = getTexture(material.occlusionTexture);
+        glMaterial.metallicRoughnessTexture = getTexture(pbr.metallicRoughnessTexture, TextureChannel.G|TextureChannel.B);
+        glMaterial.normalTexture = getTexture(material.normalTexture, TextureChannel.RG, false, true);
+        glMaterial.occlusionTexture = getTexture(material.occlusionTexture, TextureChannel.R);
         glMaterial.occlusionStrength = (material.occlusionTexture && material.occlusionTexture.strength) ?
                                         material.occlusionTexture.strength : 1.0;
         glMaterial.emissiveFactor = vec3.clone(material.emissiveFactor || DEFAULT_EMISSIVE_FACTOR);
-        glMaterial.emissiveTexture = getTexture(material.emissiveTexture, true);
+        glMaterial.emissiveTexture = getTexture(material.emissiveTexture, TextureChannel.RGB, true);
 
         switch (material.alphaMode) {
           case 'BLEND':
