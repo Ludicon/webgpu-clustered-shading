@@ -29,6 +29,7 @@ import { LightSpriteVertexSource, LightSpriteFragmentSource } from './shaders/li
 import { vec2, vec3, vec4 } from '../third-party/gl-matrix/dist/esm/index.js';
 import { WebGPUTextureLoader } from '../third-party/web-texture-tool/build/webgpu-texture-loader.js';
 import { Spark } from '../third-party/spark/spark.esm.js';
+import { TextureChannel } from '../mini-gltf2.js';
 
 import { ClusterBoundsSource, ClusterLightsSource, DISPATCH_SIZE, TOTAL_TILES, CLUSTER_LIGHTS_SIZE } from './shaders/clustered-compute.js';
 
@@ -116,6 +117,7 @@ export class WebGPURenderer extends Renderer {
     });*/
 
     this.textureLoader = new WebGPUTextureLoader(this.device);
+    this.spark = await Spark.create(this.device);
 
     this.colorAttachment = {
       // view is acquired and set in onResize.
@@ -425,8 +427,37 @@ export class WebGPURenderer extends Renderer {
   }
 
   async initImage(image) {
-    const result = await this.textureLoader.fromBlob(await image.blob, {colorSpace: image.colorSpace});
-    image.gpuTextureView = result.texture.createView();
+    let blob = await image.blob;
+    if (this.enableSpark && blob.type !== "image/ktx2") {
+      // Determine smallest format that can accommodate all present channels
+      let format;
+      if (image.channelMask & TextureChannel.A) {
+        format = 'rgba';
+      } else if (image.channelMask & TextureChannel.B) {
+        format = 'rgb';
+      } else if (image.channelMask & TextureChannel.G) {
+        format = 'rg';
+      } else {
+        format = 'r';
+      }
+
+      const imageBitmap = await createImageBitmap(blob, {
+        imageOrientation: "none",
+        colorSpaceConversion: "none",
+        premultiplyAlpha: "none",
+      });
+      const texture = await this.spark.encodeTexture(imageBitmap, {
+        format,
+        srgb: image.colorSpace == "sRGB",
+        normal: image.normalMap,
+      });
+      image.gpuTextureView = texture.createView();
+    } else {
+      const result = await this.textureLoader.fromBlob(blob, {
+        colorSpace: image.colorSpace,
+      });
+      image.gpuTextureView = result.texture.createView();
+    }
   }
 
   initSampler(sampler) {

@@ -69,11 +69,16 @@
         lightPattern: 'wandering',
         lightCount: 128,
         maxLightRange: 2,
+        enableSpark: false,
       };
 
       const meshPaths = {
         'Sponza': './media/models/sponza/sponza.glb',
-        'Sponza (KTX)': './media/models/sponza/sponza-ktx.glb',
+        'Sponza (KTX-ETC1S)': './media/models/sponza/sponza-ktx.glb',
+        'Sponza (KTX-UASTC)': './media/models/sponza/sponza-ktx-uastc.glb',
+        'Sponza (PNG)': './media/models/sponza/sponza-png.glb',
+        'Sponza (AVIF-hi)': './media/models/sponza/sponza-avif-hi.glb',
+        'Sponza (AVIF-lo)': './media/models/sponza/sponza-avif-lo.glb',
       };
 
       let gui = new dat.GUI();
@@ -100,6 +105,12 @@
         }
       });
 
+      gui.add(appSettings, 'enableSpark').onChange(() => {
+        if (renderer) {
+          renderer.enableSpark = appSettings.enableSpark;
+        }
+        initGltf();
+      });
       /*gui.add(appSettings, 'lightPattern', {
         wandering: 'wandering',
         grid: 'grid',
