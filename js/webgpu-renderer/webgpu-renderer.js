@@ -117,7 +117,7 @@ export class WebGPURenderer extends Renderer {
     });*/
 
     this.textureLoader = new WebGPUTextureLoader(this.device);
-    this.spark = await Spark.create(this.device);
+    this.spark = await Spark.create(this.device, { preload: ["rgba", "rgb", "rg"] });
 
     this.colorAttachment = {
       // view is acquired and set in onResize.
