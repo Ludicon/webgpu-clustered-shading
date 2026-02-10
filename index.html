@@ -73,11 +73,15 @@
         sparkLowQuality: false,
       };
 
+      // sponza-png.gltf is not included in the repository because it's too large, but you can
+      // download it from https://github.com/Ludicon/sponza-gltf
+      // sponza-ktx-uastc.gltf is not included in the repository because it's too large, but you can
+      // generate it with `gltf-transform uastc sponza-png.gltf sponza-uastc.gltf`
       const meshPaths = {
         'Sponza': './media/models/sponza/sponza.glb',
         'Sponza (KTX-ETC1S)': './media/models/sponza/sponza-ktx.glb',
-        'Sponza (KTX-UASTC)': './media/models/sponza/sponza-ktx-uastc.glb',
-        'Sponza (PNG)': './media/models/sponza/sponza-png.glb',
+        //'Sponza (KTX-UASTC)': './media/models/sponza/sponza-ktx-uastc.glb',
+        //'Sponza (PNG)': './media/models/sponza/sponza-png.glb',
         'Sponza (AVIF-hi)': './media/models/sponza/sponza-avif-hi.glb',
         'Sponza (AVIF-lo)': './media/models/sponza/sponza-avif-lo.glb',
       };
